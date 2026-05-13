@@ -158,23 +158,12 @@
 
   <script>
     /* ═══════════════════════════════════════════════════════
-       CONFIGURAZIONE — modifica solo questa sezione
-       Per aggiungere un calendario: aggiungi un oggetto
-       { id, name, color } all'array CALENDARS qui sotto.
+       CONFIGURAZIONE
+       I calendari si gestiscono nel Google Apps Script.
+       Qui c'è solo l'URL dello script e l'intervallo di refresh.
     ═══════════════════════════════════════════════════════ */
 
-    const API_KEY = 'AIzaSyAVpayBXdUEcv6D-37KYiWv7dYfh6O-YWM';
-
-    const CALENDARS = [
-      {
-        id:    'sanzeno.org_ilafkr64ddo2m431nf2h2gd2qg@group.calendar.google.com',
-        name:  'Training Campus',
-        color: '#22C55E'   // verde
-      },
-      // ── Aggiungi altri calendari qui sotto ──
-      // { id: 'xxx@group.calendar.google.com', name: 'Nome Calendario', color: '#RRGGBB' },
-    ];
-
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKxEhHB_PxwkAtw2HvM0hI2a1voHYvgBrCtKWKNMsMajjdIu-b6UtzazOwLcABL0CB/exec';
     const REFRESH_MS = 10 * 60 * 1000; // 10 minuti
 
     /* ═══════════════════════════════════════════════════════
@@ -193,24 +182,26 @@
       return `rgba(${r},${g},${b},${alpha})`;
     }
 
-    /* ── HEADER: data e legenda calendari ── */
+    /* ── HEADER: data ── */
     function updateHeader() {
       const now = new Date();
       document.getElementById('dayName').textContent     = GIORNI[now.getDay()];
       document.getElementById('dateDisplay').textContent = `${now.getDate()} ${MESI[now.getMonth()]} ${now.getFullYear()}`;
+    }
 
+    /* ── HEADER: legenda calendari (costruita dai dati dello script) ── */
+    function updateCalList(calendars) {
       const list = document.getElementById('calList');
-      if (!list.hasChildNodes()) {
-        CALENDARS.forEach(cal => {
-          const badge = document.createElement('div');
-          badge.className = 'cal-badge';
-          badge.innerHTML = `
-            <div class="cal-dot" style="background:${cal.color};"></div>
-            <span class="cal-name">${cal.name}</span>
-          `;
-          list.appendChild(badge);
-        });
-      }
+      list.innerHTML = '';
+      calendars.forEach(cal => {
+        const badge = document.createElement('div');
+        badge.className = 'cal-badge';
+        badge.innerHTML = `
+          <div class="cal-dot" style="background:${cal.color};"></div>
+          <span class="cal-name">${cal.name}</span>
+        `;
+        list.appendChild(badge);
+      });
     }
 
     /* ── Formattazione ora ── */
@@ -244,8 +235,8 @@
       events.forEach(ev => {
         const card = document.createElement('div');
         card.className = 'event-card';
-        card.style.borderLeft  = `3px solid ${ev.color}`;
-        card.style.background  = hexToRgba(ev.color, 0.08);
+        card.style.borderLeft = `3px solid ${ev.color}`;
+        card.style.background = hexToRgba(ev.color, 0.08);
 
         let metaHTML = '';
         if (ev.isAllDay) {
@@ -268,54 +259,28 @@
       });
     }
 
-    /* ── Fetch eventi da un singolo calendario ── */
-    async function fetchCalendar(cal, timeMin, timeMax) {
-      const calId = encodeURIComponent(cal.id);
-      const url = [
-        `https://www.googleapis.com/calendar/v3/calendars/${calId}/events`,
-        `?key=${API_KEY}`,
-        `&timeMin=${timeMin}`,
-        `&timeMax=${timeMax}`,
-        `&singleEvents=true`,
-        `&orderBy=startTime`
-      ].join('');
-
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status} – ${cal.name}`);
-      const data = await res.json();
-
-      return (data.items || []).map(ev => ({ ...ev, _calColor: cal.color }));
-    }
-
     /* ── Smistamento mattina / pomeriggio ── */
     function processEvents(items) {
       const morning   = [];
       const afternoon = [];
 
       items.forEach(ev => {
-        const title    = (ev.summary  || '').trim() || 'Evento senza titolo';
-        const location = (ev.location || '').trim();
-        const color    = ev._calColor;
-
-        if (!ev.start.dateTime) {
-          morning.push({ title, location, color, isAllDay: true, isSpanning: false, sortTime: 0 });
+        if (ev.isAllDay) {
+          morning.push({ ...ev, isSpanning: false, sortTime: 0 });
           return;
         }
 
-        const startDate = new Date(ev.start.dateTime);
-        const endDate   = new Date(ev.end.dateTime);
+        const startDate = new Date(ev.startTime);
+        const endDate   = new Date(ev.endTime);
         const startHour = startDate.getHours() + startDate.getMinutes() / 60;
         const endHour   = endDate.getHours()   + endDate.getMinutes()   / 60;
 
         const obj = {
-          title,
-          location,
-          color,
-          startStr:  fmtTime(ev.start.dateTime),
-          endStr:    fmtTime(ev.end.dateTime),
-          isAllDay:  false,
+          ...ev,
+          startStr:   fmtTime(ev.startTime),
+          endStr:     fmtTime(ev.endTime),
           isSpanning: startHour < 13 && endHour > 13,
-          sortTime:  startDate.getTime()
+          sortTime:   startDate.getTime()
         };
 
         if (startHour < 13) morning.push(obj);
@@ -328,20 +293,17 @@
       return { morning, afternoon };
     }
 
-    /* ── Fetch tutti i calendari in parallelo e render ── */
+    /* ── Fetch dallo script e render ── */
     async function fetchAndRender() {
-      const now        = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(),  0,  0,  0).toISOString();
-      const endOfDay   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).toISOString();
-
+      const now = new Date();
       try {
-        const results = await Promise.all(
-          CALENDARS.map(cal => fetchCalendar(cal, startOfDay, endOfDay))
-        );
+        const res  = await fetch(SCRIPT_URL, { redirect: 'follow' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
 
-        const allItems = results.flat();
-        const { morning, afternoon } = processEvents(allItems);
+        updateCalList(data.calendars || []);
 
+        const { morning, afternoon } = processEvents(data.events || []);
         renderColumn('colMattina',    morning);
         renderColumn('colPomeriggio', afternoon);
 
