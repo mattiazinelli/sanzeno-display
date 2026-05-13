@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>San Zeno – Programmazione del Giorno</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d1117;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 52px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: #0a0e14;
+      flex-shrink: 0;
+    }
+
+    .logo { display: flex; align-items: center; gap: 18px; }
+    .logo-text .main { font-size: 30px; font-weight: 700; letter-spacing: 0.3px; line-height: 1.1; }
+    .logo-text .sub  { font-size: 10px; letter-spacing: 2px; opacity: 0.65; font-weight: 500; margin-top: 2px; }
+
+    .header-date .day-name { font-size: 13px; letter-spacing: 3px; opacity: 0.65; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
+    .header-date .date     { font-size: 40px; font-weight: 700; letter-spacing: -1px; line-height: 1; text-align: center; }
+
+    .header-cal { text-align: right; }
+    .header-cal .label { font-size: 10px; letter-spacing: 2px; opacity: 0.6; text-transform: uppercase; margin-bottom: 7px; }
+    .cal-list   { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+    .cal-badge  { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+    .cal-dot    { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .cal-name   { font-size: 14px; font-weight: 500; opacity: 0.9; }
+
+    /* ── CONTENT ── */
+    .content { display: flex; flex: 1; min-height: 0; }
+
+    .column {
+      flex: 1;
+      padding: 24px 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .column-header {
+      font-size: 11px;
+      letter-spacing: 3px;
+      opacity: 0.55;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .divider {
+      width: 1px;
+      background: rgba(255,255,255,0.07);
+      flex-shrink: 0;
+      margin: 24px 0;
+    }
+
+    /* ── EVENT CARD ── */
+    .event-card { padding: 10px 16px; }
+
+    .event-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .event-time       { font-size: 13px; opacity: 0.75; letter-spacing: 0.2px; }
+    .event-span-label { font-size: 10px; opacity: 0.65; letter-spacing: 1px; }
+    .event-title      { font-size: 21px; font-weight: 500; line-height: 1.2; margin-bottom: 5px; }
+    .event-location   { font-size: 13px; opacity: 0.7; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      opacity: 0.16;
+    }
+
+    .empty-state svg  { width: 44px; height: 44px; }
+    .empty-state .text { font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 500; }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 6px 52px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .footer span { font-size: 11px; opacity: 0.18; letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <div class="header">
+
+    <div class="logo">
+      <svg width="62" height="62" viewBox="0 0 38 38" aria-label="Logo San Zeno">
+        <circle cx="19" cy="19" r="19" fill="white"/>
+        <circle cx="19" cy="10"  r="3.2" fill="#C0392B"/>
+        <polygon points="14,32 19,14 24,32" fill="#C0392B"/>
+        <circle cx="10.5" cy="14" r="2.5" fill="#C0392B"/>
+        <polygon points="6.5,32 10.5,17 14.5,32" fill="#C0392B"/>
+        <circle cx="27.5" cy="14" r="2.5" fill="#C0392B"/>
+        <polygon points="23.5,32 27.5,17 31.5,32" fill="#C0392B"/>
+      </svg>
+      <div class="logo-text">
+        <div class="main">SanZeno</div>
+        <div class="sub">SALESIANI DON BOSCO &middot; VERONA</div>
+      </div>
+    </div>
+
+    <div class="header-date">
+      <div class="day-name" id="dayName">—</div>
+      <div class="date"     id="dateDisplay">—</div>
+    </div>
+
+    <div class="header-cal">
+      <div class="label">Calendari</div>
+      <div class="cal-list" id="calList"></div>
+    </div>
+
+  </div>
+
+  <!-- ── CONTENT ── -->
+  <div class="content">
+
+    <div class="column" id="colMattina">
+      <div class="column-header">◐ &nbsp;Mattina</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="column" id="colPomeriggio">
+      <div class="column-header">☀ &nbsp;Pomeriggio</div>
+    </div>
+
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <span>San Zeno Salesiani Don Bosco – Verona</span>
+    <span id="lastUpdate">—</span>
+  </div>
+
+  <script>
+    /* ═══════════════════════════════════════════════════════
+       CONFIGURAZIONE — modifica solo questa sezione
+       Per aggiungere un calendario: aggiungi un oggetto
+       { id, name, color } all'array CALENDARS qui sotto.
+    ═══════════════════════════════════════════════════════ */
+
+    const API_KEY = 'AIzaSyAVpayBXdUEcv6D-37KYiWv7dYfh6O-YWM';
+
+    const CALENDARS = [
+      {
+        id:    'sanzeno.org_ilafkr64ddo2m431nf2h2gd2qg@group.calendar.google.com',
+        name:  'Training Campus',
+        color: '#22C55E'   // verde
+      },
+      // ── Aggiungi altri calendari qui sotto ──
+      // { id: 'xxx@group.calendar.google.com', name: 'Nome Calendario', color: '#RRGGBB' },
+    ];
+
+    const REFRESH_MS = 10 * 60 * 1000; // 10 minuti
+
+    /* ═══════════════════════════════════════════════════════
+       FINE CONFIGURAZIONE
+    ═══════════════════════════════════════════════════════ */
+
+    const GIORNI = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+    const MESI   = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+                    'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
+    /* Converte #RRGGBB in rgba(r,g,b,alpha) */
+    function hexToRgba(hex, alpha) {
+      const r = parseInt(hex.slice(1,3), 16);
+      const g = parseInt(hex.slice(3,5), 16);
+      const b = parseInt(hex.slice(5,7), 16);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    /* ── HEADER: data e legenda calendari ── */
+    function updateHeader() {
+      const now = new Date();
+      document.getElementById('dayName').textContent     = GIORNI[now.getDay()];
+      document.getElementById('dateDisplay').textContent = `${now.getDate()} ${MESI[now.getMonth()]} ${now.getFullYear()}`;
+
+      const list = document.getElementById('calList');
+      if (!list.hasChildNodes()) {
+        CALENDARS.forEach(cal => {
+          const badge = document.createElement('div');
+          badge.className = 'cal-badge';
+          badge.innerHTML = `
+            <div class="cal-dot" style="background:${cal.color};"></div>
+            <span class="cal-name">${cal.name}</span>
+          `;
+          list.appendChild(badge);
+        });
+      }
+    }
+
+    /* ── Formattazione ora ── */
+    function fmtTime(iso) {
+      return new Date(iso).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    /* ── Icona empty state ── */
+    function emptyIcon() {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="15" x2="15" y2="15"/>
+      </svg>`;
+    }
+
+    /* ── Rendering di una colonna ── */
+    function renderColumn(colId, events) {
+      const col = document.getElementById(colId);
+      while (col.children.length > 1) col.removeChild(col.lastChild);
+
+      if (events.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.innerHTML = `${emptyIcon()}<div class="text">Nessun evento programmato</div>`;
+        col.appendChild(empty);
+        return;
+      }
+
+      events.forEach(ev => {
+        const card = document.createElement('div');
+        card.className = 'event-card';
+        card.style.borderLeft  = `3px solid ${ev.color}`;
+        card.style.background  = hexToRgba(ev.color, 0.08);
+
+        let metaHTML = '';
+        if (ev.isAllDay) {
+          metaHTML = `<div class="event-meta"><span class="event-time">Tutto il giorno</span></div>`;
+        } else if (ev.isSpanning) {
+          metaHTML = `<div class="event-meta">
+            <span class="event-time">${ev.startStr} – ${ev.endStr}</span>
+            <span class="event-span-label">giornata intera</span>
+          </div>`;
+        } else {
+          metaHTML = `<div class="event-meta"><span class="event-time">${ev.startStr} – ${ev.endStr}</span></div>`;
+        }
+
+        const locHTML = ev.location
+          ? `<div class="event-location">&#9679; ${ev.location}</div>`
+          : '';
+
+        card.innerHTML = `${metaHTML}<div class="event-title">${ev.title}</div>${locHTML}`;
+        col.appendChild(card);
+      });
+    }
+
+    /* ── Fetch eventi da un singolo calendario ── */
+    async function fetchCalendar(cal, timeMin, timeMax) {
+      const calId = encodeURIComponent(cal.id);
+      const url = [
+        `https://www.googleapis.com/calendar/v3/calendars/${calId}/events`,
+        `?key=${API_KEY}`,
+        `&timeMin=${timeMin}`,
+        `&timeMax=${timeMax}`,
+        `&singleEvents=true`,
+        `&orderBy=startTime`
+      ].join('');
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status} – ${cal.name}`);
+      const data = await res.json();
+
+      return (data.items || []).map(ev => ({ ...ev, _calColor: cal.color }));
+    }
+
+    /* ── Smistamento mattina / pomeriggio ── */
+    function processEvents(items) {
+      const morning   = [];
+      const afternoon = [];
+
+      items.forEach(ev => {
+        const title    = (ev.summary  || '').trim() || 'Evento senza titolo';
+        const location = (ev.location || '').trim();
+        const color    = ev._calColor;
+
+        if (!ev.start.dateTime) {
+          morning.push({ title, location, color, isAllDay: true, isSpanning: false, sortTime: 0 });
+          return;
+        }
+
+        const startDate = new Date(ev.start.dateTime);
+        const endDate   = new Date(ev.end.dateTime);
+        const startHour = startDate.getHours() + startDate.getMinutes() / 60;
+        const endHour   = endDate.getHours()   + endDate.getMinutes()   / 60;
+
+        const obj = {
+          title,
+          location,
+          color,
+          startStr:  fmtTime(ev.start.dateTime),
+          endStr:    fmtTime(ev.end.dateTime),
+          isAllDay:  false,
+          isSpanning: startHour < 13 && endHour > 13,
+          sortTime:  startDate.getTime()
+        };
+
+        if (startHour < 13) morning.push(obj);
+        else                 afternoon.push(obj);
+      });
+
+      morning.sort((a, b)   => a.sortTime - b.sortTime);
+      afternoon.sort((a, b) => a.sortTime - b.sortTime);
+
+      return { morning, afternoon };
+    }
+
+    /* ── Fetch tutti i calendari in parallelo e render ── */
+    async function fetchAndRender() {
+      const now        = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(),  0,  0,  0).toISOString();
+      const endOfDay   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).toISOString();
+
+      try {
+        const results = await Promise.all(
+          CALENDARS.map(cal => fetchCalendar(cal, startOfDay, endOfDay))
+        );
+
+        const allItems = results.flat();
+        const { morning, afternoon } = processEvents(allItems);
+
+        renderColumn('colMattina',    morning);
+        renderColumn('colPomeriggio', afternoon);
+
+        document.getElementById('lastUpdate').textContent =
+          `Aggiornato alle ${now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`;
+
+      } catch (err) {
+        console.error('Errore recupero eventi:', err);
+        document.getElementById('lastUpdate').textContent =
+          `Errore di aggiornamento – riprovo tra 10 min`;
+      }
+    }
+
+    /* ── Avvio ── */
+    updateHeader();
+    fetchAndRender();
+    setInterval(() => { updateHeader(); fetchAndRender(); }, REFRESH_MS);
+  </script>
+
+</body>
+</html>
