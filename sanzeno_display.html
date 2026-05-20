@@ -8,8 +8,8 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #0d1117;
-      color: white;
+      background: #ffffff;
+      color: #111111;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
       height: 100vh;
       overflow: hidden;
@@ -22,44 +22,42 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 22px 52px 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: #0a0e14;
+      padding: 14px 52px 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      background: #f7f7f7;
       flex-shrink: 0;
     }
 
     .logo { display: flex; align-items: center; gap: 18px; }
-    .logo-text .main { font-size: 30px; font-weight: 700; letter-spacing: 0.3px; line-height: 1.1; }
-    .logo-text .sub  { font-size: 10px; letter-spacing: 2px; opacity: 0.65; font-weight: 500; margin-top: 2px; }
 
-    .header-date .day-name { font-size: 13px; letter-spacing: 3px; opacity: 0.65; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
-    .header-date .date     { font-size: 40px; font-weight: 700; letter-spacing: -1px; line-height: 1; text-align: center; }
+    .header-date .day-name { font-size: 13px; letter-spacing: 3px; opacity: 0.5; text-transform: uppercase; margin-bottom: 3px; text-align: center; }
+    .header-date .date     { font-size: 40px; font-weight: 700; letter-spacing: -1px; line-height: 1; text-align: center; color: #111111; }
 
     .header-cal { text-align: right; }
-    .header-cal .label { font-size: 10px; letter-spacing: 2px; opacity: 0.6; text-transform: uppercase; margin-bottom: 7px; }
+    .header-cal .label { font-size: 10px; letter-spacing: 2px; opacity: 0.5; text-transform: uppercase; margin-bottom: 6px; }
     .cal-list   { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
     .cal-badge  { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
     .cal-dot    { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-    .cal-name   { font-size: 14px; font-weight: 500; opacity: 0.9; }
+    .cal-name   { font-size: 14px; font-weight: 500; opacity: 0.85; }
 
     /* ── CONTENT ── */
     .content { display: flex; flex: 1; min-height: 0; }
 
     .column {
       flex: 1;
-      padding: 24px 44px;
+      padding: 14px 44px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px;
       overflow: hidden;
     }
 
     .column-header {
       font-size: 11px;
       letter-spacing: 3px;
-      opacity: 0.55;
+      opacity: 0.45;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -67,25 +65,25 @@
 
     .divider {
       width: 1px;
-      background: rgba(255,255,255,0.07);
+      background: rgba(0,0,0,0.1);
       flex-shrink: 0;
-      margin: 24px 0;
+      margin: 14px 0;
     }
 
     /* ── EVENT CARD ── */
-    .event-card { padding: 10px 16px; }
+    .event-card { padding: 7px 14px; }
 
     .event-meta {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
-    .event-time       { font-size: 13px; opacity: 0.75; letter-spacing: 0.2px; }
-    .event-span-label { font-size: 10px; opacity: 0.65; letter-spacing: 1px; }
-    .event-title      { font-size: 21px; font-weight: 500; line-height: 1.2; margin-bottom: 5px; }
-    .event-location   { font-size: 13px; opacity: 0.7; }
+    .event-time       { font-size: 13px; opacity: 0.6; letter-spacing: 0.2px; }
+    .event-span-label { font-size: 10px; opacity: 0.5; letter-spacing: 1px; }
+    .event-title      { font-size: 20px; font-weight: 600; line-height: 1.2; margin-bottom: 3px; color: #111111; }
+    .event-location   { font-size: 12px; opacity: 0.6; }
 
     /* ── EMPTY STATE ── */
     .empty-state {
@@ -95,23 +93,35 @@
       align-items: center;
       justify-content: center;
       gap: 14px;
-      opacity: 0.16;
+      opacity: 0.2;
     }
 
-    .empty-state svg  { width: 44px; height: 44px; }
+    .empty-state svg   { width: 40px; height: 40px; }
     .empty-state .text { font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 500; }
 
     /* ── FOOTER ── */
     .footer {
       padding: 6px 52px;
-      border-top: 1px solid rgba(255,255,255,0.05);
+      border-top: 1px solid rgba(0,0,0,0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
+      background: #f7f7f7;
     }
 
-    .footer span { font-size: 11px; opacity: 0.18; letter-spacing: 0.5px; }
+    .footer-clock {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111111;
+      letter-spacing: 1px;
+    }
+
+    .footer-update {
+      font-size: 11px;
+      opacity: 0.3;
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body>
@@ -120,7 +130,7 @@
   <div class="header">
 
     <div class="logo">
-      <img src="logo%20ISSZ.png" alt="Logo San Zeno" style="height: 130px; width: auto; mix-blend-mode: screen; align-self: flex-end;">
+      <img src="logo_colori.png" alt="Logo San Zeno" style="height: 110px; width: auto; mix-blend-mode: multiply; align-self: flex-end;">
     </div>
 
     <div class="header-date">
@@ -152,15 +162,13 @@
 
   <!-- ── FOOTER ── -->
   <div class="footer">
-    <span>San Zeno Salesiani Don Bosco – Verona</span>
-    <span id="lastUpdate">—</span>
+    <span class="footer-clock" id="clock">—</span>
+    <span class="footer-update" id="lastUpdate">—</span>
   </div>
 
   <script>
     /* ═══════════════════════════════════════════════════════
        CONFIGURAZIONE
-       I calendari si gestiscono nel Google Apps Script.
-       Qui c'è solo l'URL dello script e l'intervallo di refresh.
     ═══════════════════════════════════════════════════════ */
 
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKxEhHB_PxwkAtw2HvM0hI2a1voHYvgBrCtKWKNMsMajjdIu-b6UtzazOwLcABL0CB/exec';
@@ -182,6 +190,14 @@
       return `rgba(${r},${g},${b},${alpha})`;
     }
 
+    /* ── Orologio in tempo reale ── */
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${h}:${m}`;
+    }
+
     /* ── HEADER: data ── */
     function updateHeader() {
       const now = new Date();
@@ -189,7 +205,7 @@
       document.getElementById('dateDisplay').textContent = `${now.getDate()} ${MESI[now.getMonth()]} ${now.getFullYear()}`;
     }
 
-    /* ── HEADER: legenda calendari (costruita dai dati dello script) ── */
+    /* ── HEADER: legenda calendari ── */
     function updateCalList(calendars) {
       const list = document.getElementById('calList');
       list.innerHTML = '';
@@ -236,7 +252,7 @@
         const card = document.createElement('div');
         card.className = 'event-card';
         card.style.borderLeft = `3px solid ${ev.color}`;
-        card.style.background = hexToRgba(ev.color, 0.22);
+        card.style.background = hexToRgba(ev.color, 0.12);
 
         let metaHTML = '';
         if (ev.isAllDay) {
@@ -318,8 +334,10 @@
     }
 
     /* ── Avvio ── */
+    updateClock();
     updateHeader();
     fetchAndRender();
+    setInterval(updateClock, 10000); // aggiorna l'ora ogni 10 secondi
     setInterval(() => { updateHeader(); fetchAndRender(); }, REFRESH_MS);
   </script>
 
