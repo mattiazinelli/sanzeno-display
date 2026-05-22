@@ -52,17 +52,6 @@
       overflow: hidden;
     }
 
-    .column-header {
-      font-size: 1vh;
-      letter-spacing: 3px;
-      opacity: 0.45;
-      text-transform: uppercase;
-      margin-bottom: 0.3vh;
-      display: flex;
-      align-items: center;
-      gap: 0.7vw;
-    }
-
     .divider {
       width: 1px;
       background: rgba(0,0,0,0.1);
@@ -148,15 +137,11 @@
   <!-- ── CONTENT ── -->
   <div class="content">
 
-    <div class="column" id="colMattina">
-      <div class="column-header">◐ &nbsp;Mattina</div>
-    </div>
+    <div class="column" id="colSinistra"></div>
 
     <div class="divider"></div>
 
-    <div class="column" id="colPomeriggio">
-      <div class="column-header">☀ &nbsp;Pomeriggio</div>
-    </div>
+    <div class="column" id="colDestra"></div>
 
   </div>
 
@@ -238,7 +223,7 @@
     /* ── Rendering di una colonna ── */
     function renderColumn(colId, events) {
       const col = document.getElementById(colId);
-      while (col.children.length > 1) col.removeChild(col.lastChild);
+      col.innerHTML = '';
 
       if (events.length === 0) {
         const empty = document.createElement('div');
@@ -254,17 +239,9 @@
         card.style.borderLeft = `3px solid ${ev.color}`;
         card.style.background = hexToRgba(ev.color, 0.12);
 
-        let metaHTML = '';
-        if (ev.isAllDay) {
-          metaHTML = `<div class="event-meta"><span class="event-time">Tutto il giorno</span></div>`;
-        } else if (ev.isSpanning) {
-          metaHTML = `<div class="event-meta">
-            <span class="event-time">${ev.startStr} – ${ev.endStr}</span>
-            <span class="event-span-label">giornata intera</span>
-          </div>`;
-        } else {
-          metaHTML = `<div class="event-meta"><span class="event-time">${ev.startStr} – ${ev.endStr}</span></div>`;
-        }
+        const metaHTML = ev.isAllDay
+          ? `<div class="event-meta"><span class="event-time">Tutto il giorno</span></div>`
+          : `<div class="event-meta"><span class="event-time">${ev.startStr} – ${ev.endStr}</span></div>`;
 
         const locHTML = ev.location
           ? `<div class="event-location">&#9679; ${ev.location}</div>`
@@ -275,38 +252,28 @@
       });
     }
 
-    /* ── Smistamento mattina / pomeriggio ── */
+    /* ── Distribuzione cronologica su due colonne ── */
     function processEvents(items) {
-      const morning   = [];
-      const afternoon = [];
+      const events = [];
 
       items.forEach(ev => {
         if (ev.isAllDay) {
-          morning.push({ ...ev, isSpanning: false, sortTime: 0 });
+          events.push({ ...ev, startStr: '', endStr: '', sortTime: 0 });
           return;
         }
-
         const startDate = new Date(ev.startTime);
-        const endDate   = new Date(ev.endTime);
-        const startHour = startDate.getHours() + startDate.getMinutes() / 60;
-        const endHour   = endDate.getHours()   + endDate.getMinutes()   / 60;
-
-        const obj = {
+        events.push({
           ...ev,
-          startStr:   fmtTime(ev.startTime),
-          endStr:     fmtTime(ev.endTime),
-          isSpanning: startHour < 13 && endHour > 13,
-          sortTime:   startDate.getTime()
-        };
-
-        if (startHour < 13) morning.push(obj);
-        else                 afternoon.push(obj);
+          startStr: fmtTime(ev.startTime),
+          endStr:   fmtTime(ev.endTime),
+          sortTime: startDate.getTime()
+        });
       });
 
-      morning.sort((a, b)   => a.sortTime - b.sortTime);
-      afternoon.sort((a, b) => a.sortTime - b.sortTime);
+      events.sort((a, b) => a.sortTime - b.sortTime);
 
-      return { morning, afternoon };
+      const mid = Math.ceil(events.length / 2);
+      return { left: events.slice(0, mid), right: events.slice(mid) };
     }
 
     /* ── Fetch dallo script e render ── */
@@ -319,9 +286,9 @@
 
         updateCalList(data.calendars || []);
 
-        const { morning, afternoon } = processEvents(data.events || []);
-        renderColumn('colMattina',    morning);
-        renderColumn('colPomeriggio', afternoon);
+        const { left, right } = processEvents(data.events || []);
+        renderColumn('colSinistra', left);
+        renderColumn('colDestra',   right);
 
         document.getElementById('lastUpdate').textContent =
           `Aggiornato alle ${now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`;
