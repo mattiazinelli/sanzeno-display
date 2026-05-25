@@ -296,9 +296,9 @@
         /* Font proporzionali al numero di eventi: più eventi → testo più piccolo */
         const maxCol   = Math.max(left.length, right.length, 1);
         const clamp    = (min, val, max) => Math.min(max, Math.max(min, val));
-        const titleVh  = clamp(1.8, 21 / maxCol, 4.5);
-        const timeVh   = clamp(1.1, 13 / maxCol, 2.8);
-        const locVh    = clamp(1.0, 12 / maxCol, 2.5);
+        const titleVh  = clamp(1.6, 17 / maxCol, 3.8);
+        const timeVh   = clamp(1.0, 10 / maxCol, 2.4);
+        const locVh    = clamp(0.9,  9 / maxCol, 2.1);
         const root     = document.documentElement;
         root.style.setProperty('--font-title', `${titleVh.toFixed(2)}vh`);
         root.style.setProperty('--font-time',  `${timeVh.toFixed(2)}vh`);
