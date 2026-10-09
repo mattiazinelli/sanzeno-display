@@ -1,329 +1,293 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>San Zeno – Programmazione del Giorno</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>San Zeno – Programmazione del Giorno</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #14161a;
+    --ink-2: #6b7280;
+    --line: #ececee;
+    --accent: #a31d33;
+    --now-bg: #f4f4f6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
 
-    body {
-      background: #ffffff;
-      color: #111111;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+  /* ── HEADER ── */
+  .header {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+    padding: 1.4vh 3vw 1.2vh; flex-shrink: 0;
+  }
+  .logo img { height: 10.5vh; margin: -1vh 0 -1vh -1vw; width: auto; display: block; mix-blend-mode: multiply; }
+  .date-block { text-align: center; }
+  .day-name { font-size: 1.5vh; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+  .date { font-size: 4vh; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-top: 0.3vh; }
+  .legend { justify-self: end; display: flex; flex-direction: column; gap: 0.6vh; }
+  .legend-item { display: flex; align-items: center; gap: 0.6vw; font-size: 1.45vh; color: var(--ink-2); font-weight: 500; }
+  .dot { width: 1vh; height: 1vh; border-radius: 50%; flex-shrink: 0; }
 
-    /* ── HEADER ── */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.3vh 2.7vw 0.9vh;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-      background: #f7f7f7;
-      flex-shrink: 0;
-    }
+  /* ── CONTENUTO ── */
+  .content { flex: 1; min-height: 0; display: flex; padding: 0 3vw; border-top: 1px solid var(--line); }
+  .column { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .divider { width: 1px; background: var(--line); margin: 1.2vh 2.4vw; flex-shrink: 0; }
 
-    .logo { display: flex; align-items: center; gap: 1.7vw; }
+  /* ── RIGA EVENTO ── */
+  .row {
+    flex: 1 1 0; min-height: 0; max-height: 13vh;
+    display: grid; grid-template-columns: 7vw 1fr; align-items: center; gap: 1.2vw;
+    padding: 0.55vh 1vw 0.55vh 0.6vw;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .row:last-child { border-bottom: none; }
 
-    .header-date .day-name { font-size: 1.2vh; letter-spacing: 3px; opacity: 0.5; text-transform: uppercase; margin-bottom: 0.3vh; text-align: center; }
-    .header-date .date     { font-size: 3.7vh; font-weight: 700; letter-spacing: -1px; line-height: 1; text-align: center; color: #111111; }
+  .time {
+    font-variant-numeric: tabular-nums;
+    align-self: stretch; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    padding-left: 1.2vw; line-height: 1.15; border-radius: 1.1vh;
+    background: color-mix(in srgb, var(--c) 15%, #fff);
+    box-shadow: inset 0.55vh 0 0 var(--c);
+  }
+  .t-start  { font-size: var(--f-time, 2.4vh); font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+  .t-end    { font-size: calc(var(--f-time, 2.4vh) * 0.72); color: var(--ink-2); font-weight: 500; }
+  .t-allday { font-size: calc(var(--f-time, 2.4vh) * 0.62); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2); }
 
-    .header-cal { text-align: right; }
-    .header-cal .label { font-size: 0.9vh; letter-spacing: 2px; opacity: 0.5; text-transform: uppercase; margin-bottom: 0.6vh; }
-    .cal-list   { display: flex; flex-direction: column; gap: 0.5vh; align-items: flex-end; }
-    .cal-badge  { display: flex; align-items: center; gap: 0.7vw; justify-content: flex-end; }
-    .cal-dot    { width: 0.8vh; height: 0.8vh; border-radius: 50%; flex-shrink: 0; }
-    .cal-name   { font-size: 1.3vh; font-weight: 500; opacity: 0.85; }
+  .body { min-width: 0; }
+  .title {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    font-size: var(--f-title, 2.5vh); font-weight: 600; line-height: 1.18; letter-spacing: -0.01em;
+  }
+  .loc { font-size: var(--f-loc, 1.45vh); color: var(--ink-2); margin-top: 0.35vh; font-weight: 500; }
 
-    /* ── CONTENT ── */
-    .content { display: flex; flex: 1; min-height: 0; }
+  /* ── STATI ── */
+  .row.done { opacity: 0.38; }
+  .row.now  { background: var(--now-bg); border-radius: 1vh; border-bottom-color: transparent; }
+  .badge {
+    display: inline-block; margin-left: 0.9vw; vertical-align: middle;
+    font-size: calc(var(--f-loc, 1.45vh) * 0.82); font-weight: 700; letter-spacing: 0.14em;
+    color: var(--accent); text-transform: uppercase;
+  }
+  .badge::before { content: ''; display: inline-block; width: 0.8vh; height: 0.8vh; border-radius: 50%; background: var(--accent); margin-right: 0.45vw; vertical-align: middle; }
 
-    .column {
-      flex: 1;
-      padding: 1.3vh 2.3vw;
-      display: flex;
-      flex-direction: column;
-      gap: 0.55vh;
-      overflow: hidden;
-    }
+  /* ── STATO VUOTO ── */
+  .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.3vh; opacity: 0.2; }
+  .empty-state svg { width: 3.7vh; height: 3.7vh; }
+  .empty-state .text { font-size: 1.1vh; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 500; }
 
-    .divider {
-      width: 1px;
-      background: rgba(0,0,0,0.1);
-      flex-shrink: 0;
-      margin: 1.3vh 0;
-    }
-
-    /* ── EVENT CARD ── */
-    .event-card {
-      padding: calc(0.6vh * var(--col-scale, 1)) calc(1.3vw * var(--col-scale, 1));
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .event-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: calc(0.2vh * var(--col-scale, 1));
-    }
-
-    .event-time     { font-size: var(--font-time, 1.5vh); opacity: 0.6; letter-spacing: 0.2px; }
-    .event-title    { font-size: var(--font-title, 2.4vh); font-weight: 600; line-height: 1.2; margin-bottom: calc(0.25vh); color: #111111; }
-    .event-location { font-size: var(--font-loc, 1.3vh); opacity: 0.6; }
-
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1.3vh;
-      opacity: 0.2;
-    }
-
-    .empty-state svg   { width: 3.7vh; height: 3.7vh; }
-    .empty-state .text { font-size: 1.1vh; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 500; }
-
-    /* ── FOOTER ── */
-    .footer {
-      padding: 0.6vh 2.7vw;
-      border-top: 1px solid rgba(0,0,0,0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-shrink: 0;
-      background: #f7f7f7;
-    }
-
-    .footer-clock {
-      font-size: 2vh;
-      font-weight: 700;
-      color: #111111;
-      letter-spacing: 1px;
-    }
-
-    .footer-update {
-      font-size: 1vh;
-      opacity: 0.3;
-      letter-spacing: 0.5px;
-    }
-  </style>
+  /* ── FOOTER ── */
+  .footer { display: flex; justify-content: space-between; align-items: center; padding: 0.9vh 3vw; border-top: 1px solid var(--line); flex-shrink: 0; }
+  .clock { font-variant-numeric: tabular-nums; font-size: 2.6vh; font-weight: 700; letter-spacing: -0.01em; }
+  .upd { font-size: 1.1vh; color: var(--ink-2); opacity: 0.7; }
+</style>
 </head>
 <body>
 
-  <!-- ── HEADER ── -->
   <div class="header">
-
-    <div class="logo">
-      <img src="logo_colori.png" alt="Logo San Zeno" style="height: 10vh; width: auto; mix-blend-mode: multiply; align-self: flex-end;">
-    </div>
-
-    <div class="header-date">
+    <div class="logo"><img src="logo_colori.png" alt="San Zeno"></div>
+    <div class="date-block">
       <div class="day-name" id="dayName">—</div>
-      <div class="date"     id="dateDisplay">—</div>
+      <div class="date" id="dateDisplay">—</div>
     </div>
-
-    <div class="header-cal">
-      <div class="label">Calendari</div>
-      <div class="cal-list" id="calList"></div>
-    </div>
-
+    <div class="legend" id="calList"></div>
   </div>
 
-  <!-- ── CONTENT ── -->
   <div class="content">
-
     <div class="column" id="colSinistra"></div>
-
     <div class="divider"></div>
-
     <div class="column" id="colDestra"></div>
-
   </div>
 
-  <!-- ── FOOTER ── -->
   <div class="footer">
-    <span class="footer-clock" id="clock">—</span>
-    <span class="footer-update" id="lastUpdate">—</span>
+    <span class="clock" id="clock">—</span>
+    <span class="upd" id="lastUpdate">—</span>
   </div>
 
-  <script>
-    /* ═══════════════════════════════════════════════════════
-       CONFIGURAZIONE
-    ═══════════════════════════════════════════════════════ */
+<script>
+  /* ═══════════════════════════════════════════════════════
+     CONFIGURAZIONE
+  ═══════════════════════════════════════════════════════ */
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKxEhHB_PxwkAtw2HvM0hI2a1voHYvgBrCtKWKNMsMajjdIu-b6UtzazOwLcABL0CB/exec';
+  const REFRESH_MS = 10 * 60 * 1000;   // aggiornamento dati: 10 minuti
+  const TICK_MS    = 30 * 1000;        // aggiornamento stato in corso/concluso e orologio: 30 secondi
+  const TZ         = 'Europe/Rome';
 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyKxEhHB_PxwkAtw2HvM0hI2a1voHYvgBrCtKWKNMsMajjdIu-b6UtzazOwLcABL0CB/exec';
-    const REFRESH_MS = 10 * 60 * 1000; // 10 minuti
+  /* Colori più scuri per le tessere (contrasto): chiave = colore che arriva dallo script */
+  const TILE_COLORS = { '#22C55E': '#16A34A', '#C1440E': '#C1440E', '#38BDF8': '#0284C7' };
+  const tileColor = c => TILE_COLORS[String(c || '').toUpperCase()] || c || '#6b7280';
+  /* ═══════════════════════════════════════════════════════ */
 
-    /* ═══════════════════════════════════════════════════════
-       FINE CONFIGURAZIONE
-    ═══════════════════════════════════════════════════════ */
-
-    const GIORNI = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
-    const MESI   = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
-                    'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-
-    /* Converte #RRGGBB in rgba(r,g,b,alpha) */
-    function hexToRgba(hex, alpha) {
-      const r = parseInt(hex.slice(1,3), 16);
-      const g = parseInt(hex.slice(3,5), 16);
-      const b = parseInt(hex.slice(5,7), 16);
-      return `rgba(${r},${g},${b},${alpha})`;
+  /* Solo per prove: aggiungere ?t=HH:MM all'indirizzo simula l'ora (es. ?t=15:00) */
+  const dbg = new URLSearchParams(location.search).get('t');
+  function nowDate() {
+    const d = new Date();
+    if (dbg && /^\d{1,2}:\d{2}$/.test(dbg)) {
+      const [h, m] = dbg.split(':').map(Number);
+      const p = romeParts(d);
+      return new Date(Date.UTC(p.y, p.mo - 1, p.d, h - 2, m)); /* approssimazione CEST per le prove */
     }
+    return d;
+  }
 
-    /* ── Orologio in tempo reale ── */
-    function updateClock() {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      document.getElementById('clock').textContent = `${h}:${m}`;
+  function romeParts(d) {
+    const f = new Intl.DateTimeFormat('it-IT', { timeZone: TZ, year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', weekday: 'long', hour12: false });
+    const o = {}; f.formatToParts(d).forEach(p => o[p.type] = p.value);
+    return { y: +o.year, mo: +o.month, d: +o.day, h: o.hour, mi: o.minute, wd: o.weekday };
+  }
+  const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+  function fmtTime(iso) {
+    return new Date(iso).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: TZ });
+  }
+
+  /* Pulizia sede: "Edificio B-0-FCS B01 - Aula Didattica (20)" → "Edificio B · FCS B01 - Aula Didattica"
+     Toglie capienze "(20)", dotazioni "[AppleTV, Proiettore]" e il prefisso "(Altro)-". */
+  function cleanLocation(raw) {
+    if (!raw) return '';
+    let s = String(raw).replace(/\[[^\]]*\]/g, '').replace(/\s*\(\d+\)/g, '').replace(/^\(Altro\)-/, '').trim();
+    const m = s.match(/^(Edificio [^-]+?)-+-?\d+-(.+)$/);
+    if (m) return `${m[1].trim()} · ${m[2].trim()}`;
+    return s;
+  }
+
+  function updateClockAndDate() {
+    const d = nowDate(), p = romeParts(d);
+    document.getElementById('clock').textContent = `${p.h}:${p.mi}`;
+    document.getElementById('dayName').textContent = cap(p.wd);
+    document.getElementById('dateDisplay').textContent = `${p.d} ${MESI[p.mo - 1]} ${p.y}`;
+  }
+
+  function updateCalList(calendars) {
+    const list = document.getElementById('calList');
+    list.innerHTML = '';
+    calendars.forEach(cal => {
+      const item = document.createElement('div');
+      item.className = 'legend-item';
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      dot.style.background = tileColor(cal.color);
+      const name = document.createElement('span');
+      name.textContent = cal.name;
+      item.append(dot, name);
+      list.appendChild(item);
+    });
+  }
+
+  function emptyIcon() {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`;
+  }
+
+  function renderColumn(colId, events, nowMs) {
+    const col = document.getElementById(colId);
+    col.innerHTML = '';
+    if (events.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.innerHTML = `${emptyIcon()}<div class="text">Nessun evento programmato</div>`;
+      col.appendChild(empty);
+      return;
     }
+    events.forEach(ev => {
+      let state = 'next';
+      if (ev.isAllDay) state = 'allday';
+      else if (nowMs >= ev.endMs) state = 'done';
+      else if (nowMs >= ev.startMs) state = 'now';
 
-    /* ── HEADER: data ── */
-    function updateHeader() {
-      const now = new Date();
-      document.getElementById('dayName').textContent     = GIORNI[now.getDay()];
-      document.getElementById('dateDisplay').textContent = `${now.getDate()} ${MESI[now.getMonth()]} ${now.getFullYear()}`;
-    }
+      const row = document.createElement('div');
+      row.className = 'row' + (state === 'done' ? ' done' : state === 'now' ? ' now' : '');
+      row.style.setProperty('--c', tileColor(ev.color));
 
-    /* ── HEADER: legenda calendari ── */
-    function updateCalList(calendars) {
-      const list = document.getElementById('calList');
-      list.innerHTML = '';
-      calendars.forEach(cal => {
-        const badge = document.createElement('div');
-        badge.className = 'cal-badge';
-        badge.innerHTML = `
-          <div class="cal-dot" style="background:${cal.color};"></div>
-          <span class="cal-name">${cal.name}</span>
-        `;
-        list.appendChild(badge);
-      });
-    }
-
-    /* ── Formattazione ora ── */
-    function fmtTime(iso) {
-      return new Date(iso).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    /* ── Icona empty state ── */
-    function emptyIcon() {
-      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3" y="4" width="18" height="18" rx="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="15" x2="15" y2="15"/>
-      </svg>`;
-    }
-
-    /* ── Rendering di una colonna ── */
-    function renderColumn(colId, events) {
-      const col = document.getElementById(colId);
-      col.innerHTML = '';
-
-      if (events.length === 0) {
-        const empty = document.createElement('div');
-        empty.className = 'empty-state';
-        empty.innerHTML = `${emptyIcon()}<div class="text">Nessun evento programmato</div>`;
-        col.appendChild(empty);
-        return;
+      const time = document.createElement('div');
+      time.className = 'time';
+      if (ev.isAllDay) {
+        time.innerHTML = `<span class="t-allday">Tutto il<br>giorno</span>`;
+      } else {
+        time.innerHTML = `<span class="t-start">${ev.startStr}</span><span class="t-end">${ev.endStr}</span>`;
       }
 
-      events.forEach(ev => {
-        const card = document.createElement('div');
-        card.className = 'event-card';
-        card.style.borderLeft = `3px solid ${ev.color}`;
-        card.style.background = hexToRgba(ev.color, 0.28);
+      const body = document.createElement('div');
+      body.className = 'body';
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = ev.title;
+      body.appendChild(title);
 
-        const metaHTML = ev.isAllDay
-          ? `<div class="event-meta"><span class="event-time">Tutto il giorno</span></div>`
-          : `<div class="event-meta"><span class="event-time">${ev.startStr} – ${ev.endStr}</span></div>`;
-
-        const locHTML = ev.location
-          ? `<div class="event-location">&#9679; ${ev.location}</div>`
-          : '';
-
-        card.innerHTML = `${metaHTML}<div class="event-title">${ev.title}</div>${locHTML}`;
-        col.appendChild(card);
-      });
-    }
-
-    /* ── Distribuzione cronologica su due colonne ── */
-    function processEvents(items) {
-      const events = [];
-
-      items.forEach(ev => {
-        if (ev.isAllDay) {
-          events.push({ ...ev, startStr: '', endStr: '', sortTime: 0 });
-          return;
+      if (ev.loc || state === 'now') {
+        const loc = document.createElement('div');
+        loc.className = 'loc';
+        loc.append(document.createTextNode(ev.loc || ''));
+        if (state === 'now') {
+          const b = document.createElement('span');
+          b.className = 'badge';
+          b.textContent = 'In corso';
+          loc.appendChild(b);
         }
-        const startDate = new Date(ev.startTime);
-        events.push({
-          ...ev,
-          startStr: fmtTime(ev.startTime),
-          endStr:   fmtTime(ev.endTime),
-          sortTime: startDate.getTime()
-        });
-      });
-
-      events.sort((a, b) => a.sortTime - b.sortTime);
-
-      const mid = Math.ceil(events.length / 2);
-      return { left: events.slice(0, mid), right: events.slice(mid) };
-    }
-
-    /* ── Fetch dallo script e render ── */
-    async function fetchAndRender() {
-      const now = new Date();
-      try {
-        const res  = await fetch(SCRIPT_URL, { redirect: 'follow' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-
-        updateCalList(data.calendars || []);
-
-        const { left, right } = processEvents(data.events || []);
-
-        /* Font proporzionali al numero di eventi: più eventi → testo più piccolo */
-        const maxCol   = Math.max(left.length, right.length, 1);
-        const clamp    = (min, val, max) => Math.min(max, Math.max(min, val));
-        const titleVh  = clamp(1.6, 17 / maxCol, 3.8);
-        const timeVh   = clamp(1.0, 10 / maxCol, 2.4);
-        const locVh    = clamp(0.9,  9 / maxCol, 2.1);
-        const root     = document.documentElement;
-        root.style.setProperty('--font-title', `${titleVh.toFixed(2)}vh`);
-        root.style.setProperty('--font-time',  `${timeVh.toFixed(2)}vh`);
-        root.style.setProperty('--font-loc',   `${locVh.toFixed(2)}vh`);
-
-        renderColumn('colSinistra', left);
-        renderColumn('colDestra',   right);
-
-        document.getElementById('lastUpdate').textContent =
-          `Aggiornato alle ${now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`;
-
-      } catch (err) {
-        console.error('Errore recupero eventi:', err);
-        document.getElementById('lastUpdate').textContent =
-          `Errore di aggiornamento – riprovo tra 10 min`;
+        body.appendChild(loc);
       }
+      row.append(time, body);
+      col.appendChild(row);
+    });
+  }
+
+  /* Ordine cronologico (tutto il giorno in cima) e distribuzione su due colonne */
+  function processEvents(items) {
+    const events = items.map(ev => ev.isAllDay
+      ? { ...ev, startMs: 0, endMs: 0, startStr: '', endStr: '', loc: cleanLocation(ev.location) }
+      : { ...ev, startMs: new Date(ev.startTime).getTime(), endMs: new Date(ev.endTime).getTime(),
+          startStr: fmtTime(ev.startTime), endStr: fmtTime(ev.endTime), loc: cleanLocation(ev.location) });
+    events.sort((a, b) => (b.isAllDay - a.isAllDay) || (a.startMs - b.startMs));
+    const mid = Math.ceil(events.length / 2);
+    return { left: events.slice(0, mid), right: events.slice(mid) };
+  }
+
+  let LAST = null;   // ultimi dati ricevuti, per ridisegnare lo stato senza rifare la richiesta
+
+  function draw() {
+    updateClockAndDate();
+    if (!LAST) return;
+    const { left, right } = LAST;
+    const maxCol = Math.max(left.length, right.length, 1);
+    const clamp = (lo, v, hi) => Math.min(hi, Math.max(lo, v));
+    const root = document.documentElement.style;
+    root.setProperty('--f-title', clamp(1.5, 19 / maxCol, 2.9).toFixed(2) + 'vh');
+    root.setProperty('--f-time',  clamp(1.3, 21 / maxCol, 2.4).toFixed(2) + 'vh');
+    root.setProperty('--f-loc',   clamp(1.0, 13 / maxCol, 1.8).toFixed(2) + 'vh');
+    const nowMs = nowDate().getTime();
+    renderColumn('colSinistra', left, nowMs);
+    renderColumn('colDestra', right, nowMs);
+  }
+
+  async function fetchAndRender() {
+    try {
+      const res = await fetch(SCRIPT_URL, { redirect: 'follow' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      updateCalList(data.calendars || []);
+      LAST = processEvents(data.events || []);
+      draw();
+      document.getElementById('lastUpdate').textContent =
+        `Aggiornato alle ${new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', timeZone: TZ })}`;
+    } catch (err) {
+      console.error('Errore recupero eventi:', err);
+      document.getElementById('lastUpdate').textContent = 'Errore di aggiornamento – riprovo tra 10 min';
     }
+  }
 
-    /* ── Avvio ── */
-    updateClock();
-    updateHeader();
-    fetchAndRender();
-    setInterval(updateClock, 10000); // aggiorna l'ora ogni 10 secondi
-    setInterval(() => { updateHeader(); fetchAndRender(); }, REFRESH_MS);
-  </script>
-
+  updateClockAndDate();
+  fetchAndRender();
+  setInterval(draw, TICK_MS);
+  setInterval(fetchAndRender, REFRESH_MS);
+</script>
 </body>
 </html>
