@@ -9,9 +9,9 @@
     --bg: #ffffff;
     --ink: #14161a;
     --ink-2: #6b7280;
-    --line: #ececee;
+    --line: #c3c8d0;
     --accent: #a31d33;
-    --now-bg: #f4f4f6;
+    --now-bg: #e3e6ec;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 100%; height: 100%; }
@@ -36,16 +36,16 @@
   .dot { width: 1vh; height: 1vh; border-radius: 50%; flex-shrink: 0; }
 
   /* ── CONTENUTO ── */
-  .content { flex: 1; min-height: 0; display: flex; padding: 0 3vw; border-top: 1px solid var(--line); }
+  .content { flex: 1; min-height: 0; display: flex; padding: 0 3vw; border-top: 2px solid var(--line); }
   .column { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-  .divider { width: 1px; background: var(--line); margin: 1.2vh 2.4vw; flex-shrink: 0; }
+  .divider { width: 2px; background: var(--line); margin: 1.2vh 2.4vw; flex-shrink: 0; }
 
   /* ── RIGA EVENTO ── */
   .row {
     flex: 1 1 0; min-height: 0; max-height: 13vh;
     display: grid; grid-template-columns: 7vw 1fr; align-items: center; gap: 1.2vw;
     padding: 0.55vh 1vw 0.55vh 0.6vw;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 2px solid var(--line);
     overflow: hidden;
   }
   .row:last-child { border-bottom: none; }
@@ -70,7 +70,7 @@
 
   /* ── STATI ── */
   .row.done { opacity: 0.38; }
-  .row.now  { background: var(--now-bg); border-radius: 1vh; border-bottom-color: transparent; }
+  .row.now  { background: var(--now-bg); border-radius: 1vh; border-bottom-color: transparent; box-shadow: inset 0 0 0 2px #b4bac4; }
   .badge {
     display: inline-block; margin-left: 0.9vw; vertical-align: middle;
     font-size: calc(var(--f-loc, 1.45vh) * 0.82); font-weight: 700; letter-spacing: 0.14em;
@@ -84,7 +84,7 @@
   .empty-state .text { font-size: 1.1vh; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 500; }
 
   /* ── FOOTER ── */
-  .footer { display: flex; justify-content: space-between; align-items: center; padding: 0.9vh 3vw; border-top: 1px solid var(--line); flex-shrink: 0; }
+  .footer { display: flex; justify-content: space-between; align-items: center; padding: 0.9vh 3vw; border-top: 2px solid var(--line); flex-shrink: 0; }
   .clock { font-variant-numeric: tabular-nums; font-size: 2.6vh; font-weight: 700; letter-spacing: -0.01em; }
   .upd { font-size: 1.1vh; color: var(--ink-2); opacity: 0.7; }
 </style>
