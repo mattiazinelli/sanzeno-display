@@ -123,6 +123,13 @@
   /* Colori più scuri per le tessere (contrasto): chiave = colore che arriva dallo script */
   const TILE_COLORS = { '#22C55E': '#16A34A', '#C1440E': '#C1440E', '#38BDF8': '#0284C7' };
   const tileColor = c => TILE_COLORS[String(c || '').toUpperCase()] || c || '#6b7280';
+
+  /* Colori per parola chiave nel titolo (hanno precedenza sul colore del calendario) */
+  const KEYWORD_COLORS = [
+    { re: /restauro/i,  color: '#7B2D8E' },   // uva
+    { re: /\bITS\b/,   color: '#EAB308' },   // giallo (solo "ITS" maiuscolo, parola intera)
+  ];
+  const eventColor = ev => (KEYWORD_COLORS.find(k => k.re.test(ev.title || '')) || {}).color || tileColor(ev.color);
   /* ═══════════════════════════════════════════════════════ */
 
   /* Solo per prove: aggiungere ?t=HH:MM all'indirizzo simula l'ora (es. ?t=15:00) */
@@ -206,7 +213,7 @@
 
       const row = document.createElement('div');
       row.className = 'row' + (state === 'done' ? ' done' : state === 'now' ? ' now' : '');
-      row.style.setProperty('--c', tileColor(ev.color));
+      row.style.setProperty('--c', eventColor(ev));
 
       const time = document.createElement('div');
       time.className = 'time';
