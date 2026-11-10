@@ -31,7 +31,7 @@
   .date-block { text-align: center; }
   .day-name { font-size: 1.5vh; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
   .date { font-size: 4vh; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-top: 0.3vh; }
-  .legend { justify-self: end; display: flex; flex-direction: column; gap: 0.6vh; }
+  .legend { justify-self: end; display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; row-gap: 0.6vh; column-gap: 1.8vw; }
   .legend-item { display: flex; align-items: center; gap: 0.6vw; font-size: 1.45vh; color: var(--ink-2); font-weight: 500; }
   .dot { width: 1vh; height: 1vh; border-radius: 50%; flex-shrink: 0; }
 
@@ -129,6 +129,11 @@
     { re: /restauro/i,  color: '#7B2D8E' },   // uva
     { re: /\bITS\b/,   color: '#EAB308' },   // giallo (solo "ITS" maiuscolo, parola intera)
   ];
+  /* Voci di legenda aggiunte dopo quelle dello script (colori per parola chiave) */
+  const EXTRA_LEGEND = [
+    { name: 'ITS - Istruzione Tecnica Superiore', color: '#EAB308' },
+    { name: 'Restauro',                           color: '#7B2D8E' },
+  ];
   const eventColor = ev => (KEYWORD_COLORS.find(k => k.re.test(ev.title || '')) || {}).color || tileColor(ev.color);
   /* ═══════════════════════════════════════════════════════ */
 
@@ -176,7 +181,7 @@
   function updateCalList(calendars) {
     const list = document.getElementById('calList');
     list.innerHTML = '';
-    calendars.forEach(cal => {
+    calendars.concat(EXTRA_LEGEND).forEach(cal => {
       const item = document.createElement('div');
       item.className = 'legend-item';
       const dot = document.createElement('span');
